@@ -1,4 +1,5 @@
-all: run plot
+default: plot
+
 run:
     cargo run -r > data.csv
 plot:

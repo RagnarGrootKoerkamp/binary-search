@@ -3,21 +3,26 @@ use std::{
     time::{Duration, Instant},
 };
 
-use rand::random;
+use rand::{rng, Rng};
 use rdst::RadixSort;
+use static_search_tree::{eytzinger::Eytzinger, s_tree::STree16, SearchIndex};
+
+type T = u32;
 
 /// Generate a sorted list of n random integers.
-fn random_sorted_vec(n: usize) -> Vec<u64> {
-    let mut v: Vec<u64> = (0..n).map(|_| random()).collect();
+fn random_sorted_vec(n: usize) -> Vec<T> {
+    let mut rng = rng();
+    let mut v: Vec<T> = (0..n).map(|_| rng.random_range(0..i32::MAX as T)).collect();
     v.radix_sort_unstable();
     v
 }
 
-fn random_vec(n: usize) -> Vec<u64> {
-    (0..n).map(|_| random()).collect()
+fn random_vec(n: usize) -> Vec<T> {
+    let mut rng = rng();
+    (0..n).map(|_| rng.random_range(0..i32::MAX as T)).collect()
 }
 
-fn binary_search(v: &[u64], x: u64) -> usize {
+fn binary_search(v: &[T], x: T) -> usize {
     let mut l = 0;
     // inclusive right end
     let mut h = v.len() - 1;
@@ -32,7 +37,7 @@ fn binary_search(v: &[u64], x: u64) -> usize {
     l
 }
 
-fn sqrt_search(v: &[u64], x: u64, stride: usize, block: &[u64]) -> usize {
+fn sqrt_search(v: &[T], x: T, stride: usize, block: &[T]) -> usize {
     let mut cnt = 0;
     for &v in block {
         cnt += (x >= v) as usize;
@@ -47,11 +52,12 @@ fn sqrt_search(v: &[u64], x: u64, stride: usize, block: &[u64]) -> usize {
     offset + pos
 }
 
-fn test(n: usize, q: usize) -> (Duration, Duration, Duration) {
+fn test(n: usize, q: usize) -> [Duration; 5] {
     let lookup = {
         let data = random_sorted_vec(n);
+        let mut rng = rng();
         let queries = (0..q)
-            .map(|_| random::<u64>() as usize % n)
+            .map(|_| rng.random::<T>() as usize % n)
             .collect::<Vec<_>>();
 
         let start = Instant::now();
@@ -72,39 +78,74 @@ fn test(n: usize, q: usize) -> (Duration, Duration, Duration) {
 
         let mut seed = 0;
         for &q in &queries {
-            seed = binary_search(&data, q ^ seed) as u64 & 1;
+            seed = binary_search(&data, q ^ seed) as T & 1;
         }
         black_box(seed);
 
         start.elapsed()
     };
 
-    let sqrt = {
+    // let sqrt = {
+    //     let data = random_sorted_vec(n);
+    //     let queries = random_vec(q);
+    //     let stride = n.isqrt();
+    //     let block: Vec<T> = (0..n).step_by(stride).map(|i| data[i]).collect();
+    //     // eprintln!("{stride:?} {block:?}");
+
+    //     let start = Instant::now();
+
+    //     let mut seed = 0;
+    //     for &q in &queries {
+    //         seed = sqrt_search(&data, q ^ seed, stride, &block) as T & 1;
+    //     }
+    //     black_box(seed);
+
+    //     start.elapsed()
+    // };
+    let sqrt = Duration::default();
+
+    let e = {
         let data = random_sorted_vec(n);
+        let et = Eytzinger::new(&data);
+
         let queries = random_vec(q);
-        let stride = n.isqrt();
-        let block: Vec<u64> = (0..n).step_by(stride).map(|i| data[i]).collect();
-        // eprintln!("{stride:?} {block:?}");
 
         let start = Instant::now();
 
         let mut seed = 0;
         for &q in &queries {
-            seed = sqrt_search(&data, q ^ seed, stride, &block) as u64 & 1;
+            seed = et.search_prefetch::<4>(q ^ seed);
         }
         black_box(seed);
 
         start.elapsed()
     };
 
-    (lookup, bs, sqrt)
+    let s = {
+        let data = random_sorted_vec(n);
+        let st = STree16::new(&data);
+
+        let queries = random_vec(q);
+
+        let start = Instant::now();
+
+        let mut seed = 0;
+        for &q in &queries {
+            seed = st.search(q ^ seed);
+        }
+        black_box(seed);
+
+        start.elapsed()
+    };
+
+    [lookup, bs, sqrt, e, s]
 }
 
 fn main() {
     let mut ns = vec![];
     for i in 0.. {
-        let n = ((1234. * 1.3f32.powi(i)) as usize).next_multiple_of(2);
-        if n > 1000000000 {
+        let n = ((1234. * 2.1f32.powi(i)) as usize).next_multiple_of(2);
+        if n > 10000000000 {
             break;
         }
         ns.push(n);
@@ -113,16 +154,20 @@ fn main() {
     let q = 1000000;
 
     for &n in &ns {
-        let (mut lookup, mut bs, mut sqrt) = test(n, q);
+        let [mut lookup, mut bs, mut sqrt, mut e, mut s] = test(n, q);
         lookup /= q as u32;
         bs /= q as u32;
         sqrt /= q as u32;
+        e /= q as u32;
+        s /= q as u32;
         println!(
-            "{n},{},{},{}",
+            "{n},{},{},{},{},{}",
             lookup.as_nanos(),
             bs.as_nanos(),
-            sqrt.as_nanos()
+            sqrt.as_nanos(),
+            e.as_nanos(),
+            s.as_nanos(),
         );
-        eprintln!("n {n:>10} {lookup:>7?} {bs:>7?} {sqrt:>7?}");
+        eprintln!("n {n:>10} {lookup:>7?} {bs:>7?} {sqrt:>7?} {e:>7?} {s:>7?}");
     }
 }
