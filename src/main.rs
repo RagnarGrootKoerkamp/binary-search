@@ -120,18 +120,18 @@ fn test(n: usize, q: usize) -> [Duration; 5] {
     };
 
     let s = {
-        let data = random_sorted_vec(n);
-        let st = STree16::new(&data);
+        // let data = random_sorted_vec(n);
+        // let st = STree16::new(&data);
 
-        let queries = random_vec(q);
+        // let queries = random_vec(q);
 
         let start = Instant::now();
 
-        let mut seed = 0;
-        for &q in &queries {
-            seed = st.search(q ^ seed);
-        }
-        black_box(seed);
+        // let mut seed = 0;
+        // for &q in &queries {
+        //     seed = st.search(q ^ seed);
+        // }
+        // black_box(seed);
 
         start.elapsed()
     };
@@ -143,7 +143,7 @@ fn main() {
     let mut ns = vec![];
     for i in 0.. {
         let n = ((1234. * 1.2f32.powi(i)) as usize).next_multiple_of(2);
-        if n > 10usize.pow(9) / 4 {
+        if n > 4 * 10usize.pow(9) / 4 {
             break;
         }
         ns.push(n);
