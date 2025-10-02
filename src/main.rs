@@ -154,20 +154,15 @@ fn main() {
     let q = 1000000;
 
     for &n in &ns {
-        let [mut lookup, mut bs, mut sqrt, mut e, mut s] = test(n, q);
-        lookup /= q as u32;
-        bs /= q as u32;
-        sqrt /= q as u32;
-        e /= q as u32;
-        s /= q as u32;
-        println!(
-            "{n},{},{},{},{},{}",
-            lookup.as_nanos(),
-            bs.as_nanos(),
-            sqrt.as_nanos(),
-            e.as_nanos(),
-            s.as_nanos(),
-        );
-        eprintln!("n {n:>10} {lookup:>7?} {bs:>7?} {sqrt:>7?} {e:>7?} {s:>7?}");
+        let out = test(n, q);
+        print!("{n}");
+        eprint!("n {n:>10}");
+        for x in out {
+            let y = x.as_secs_f32() * (1000f32).powf(3.) / q as f32;
+            print!(",{y:>6.3}");
+            eprint!(" {y:>4.1}");
+        }
+        println!();
+        eprintln!();
     }
 }
