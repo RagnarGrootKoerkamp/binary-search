@@ -144,8 +144,8 @@ fn test(n: usize, q: usize) -> [Duration; 5] {
 fn main() {
     let mut ns = vec![];
     for i in 0.. {
-        let n = ((1234. * 2.1f32.powi(i)) as usize).next_multiple_of(2);
-        if n > 10000000000 {
+        let n = ((1234. * 1.2f32.powi(i)) as usize).next_multiple_of(2);
+        if n > 10usize.pow(9) / 4 {
             break;
         }
         ns.push(n);
