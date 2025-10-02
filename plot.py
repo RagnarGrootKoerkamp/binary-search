@@ -16,10 +16,10 @@ for line in open("data.csv", "r"):
     n = int(line[0]) * 4  # u32
     ds = [float(x) for x in line[1:]]
 
-    if n < 10**4:
-        continue
-    if n > 10**9:
-        continue
+    # if n < 10**4:
+    #     continue
+    # if n > 10**9:
+    #     continue
     data.append((n, *ds))
 
 # Plot the data

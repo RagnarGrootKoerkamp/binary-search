@@ -53,8 +53,8 @@ fn sqrt_search(v: &[T], x: T, stride: usize, block: &[T]) -> usize {
 }
 
 fn test(n: usize, q: usize) -> [Duration; 5] {
+    let data = random_sorted_vec(n);
     let lookup = {
-        let data = random_sorted_vec(n);
         let mut rng = rng();
         let queries = (0..q)
             .map(|_| rng.random::<T>() as usize % n)
@@ -71,7 +71,6 @@ fn test(n: usize, q: usize) -> [Duration; 5] {
     };
 
     let bs = {
-        let data = random_sorted_vec(n);
         let queries = random_vec(q);
 
         let start = Instant::now();
@@ -105,7 +104,6 @@ fn test(n: usize, q: usize) -> [Duration; 5] {
     let sqrt = Duration::default();
 
     let e = {
-        let data = random_sorted_vec(n);
         let et = Eytzinger::new(&data);
 
         let queries = random_vec(q);
