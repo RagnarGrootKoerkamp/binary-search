@@ -33,16 +33,6 @@ plt.plot(
     c="black",
     alpha=0.6,
 )
-# plt.plot(
-#     [x[0] for x in data],
-#     [x[4] for x in data],
-#     label="Eytzinger",
-#     ls="-",
-#     marker="s",
-#     ms=4,
-#     c="red",
-#     alpha=0.6,
-# )
 plt.plot(
     [x[0] for x in data],
     [x[1] for x in data],
@@ -51,6 +41,16 @@ plt.plot(
     ms=2.5,
     c="green",
     # ls="--",
+    alpha=0.6,
+)
+plt.plot(
+    [x[0] for x in data],
+    [x[4] for x in data],
+    label="Eytzinger",
+    ls="-",
+    marker="o",
+    ms=2.5,
+    c="red",
     alpha=0.6,
 )
 
@@ -93,7 +93,7 @@ plt.plot(
 plt.xlabel("Array size (B)")
 
 plt.ylabel("Latency (ns)")
-plt.title("Latency of binary search vs random array indexing")
+plt.title("Latency of binary search vs Eytzinger layout")
 # plt.grid(True)
 plt.xscale("log")
 plt.yscale("log", base=2)
