@@ -16,42 +16,12 @@ for line in open("data.csv", "r"):
     n = int(line[0]) * 4  # u32
     ds = [float(x) for x in line[1:]]
 
-    # if n < 10**4:
-    #     continue
-    # if n > 10**9:
-    #     continue
     data.append((n, *ds))
 
 # Plot the data
 
-# by = "#fcc007"  # yellow
-# by2 = by  # yellow
-by = by2 = "black"
-
 plt.figure(figsize=(6, 4))
 
-# plt.plot(
-#     [x[0] for x in data],
-#     [x[5] for x in data],
-#     label="S-tree",
-#     ls="-",
-#     marker="s",
-#     ms=4,
-#     c="green",
-#     alpha=0.6,
-# )
-
-# plt.plot(
-#     [x[0] for x in data],
-#     [x[3] for x in data],
-#     label="Sqrt",
-#     ls=":",
-#     marker="s",
-#     ms=4,
-#     c="purple",
-#     # c=by,
-#     alpha=0.6,
-# )
 plt.plot(
     [x[0] for x in data],
     [x[2] for x in data],
@@ -73,15 +43,16 @@ plt.plot(
 #     c="red",
 #     alpha=0.6,
 # )
-# plt.plot(
-#     [x[0] for x in data],
-#     [x[1] for x in data],
-#     label="Array indexing",
-#     marker="x",
-#     c="blue",
-#     # ls="--",
-#     alpha=0.6,
-# )
+plt.plot(
+    [x[0] for x in data],
+    [x[1] for x in data],
+    label="Array indexing",
+    marker="o",
+    ms=2.5,
+    c="green",
+    # ls="--",
+    alpha=0.6,
+)
 
 
 xs = [d[0] for d in data]
@@ -95,26 +66,26 @@ plt.plot(
     lw=0.7,
     # alpha=0.6,
 )
-# plt.plot(
-#     [x for x in xs],
-#     [(x / data[20][0]) ** 0.35 * data[20][1] for x in xs],
-#     label="~n^0.35",
-#     # marker="x",
-#     c="blue",
-#     ls="--",
-#     lw=1,
-#     # alpha=0.6,
-# )
+plt.plot(
+    [x for x in xs],
+    [(x / data[20][0]) ** 0.35 * data[20][1] for x in xs],
+    label="~n^0.35",
+    # marker="x",
+    c="blue",
+    ls="--",
+    lw=1,
+    # alpha=0.6,
+)
 
 # Specific data points
 
 plt.xlabel("Array size (B)")
 
-plt.ylabel("Latency (ns)", c=by2)
-plt.title("Latency of binary search")
+plt.ylabel("Latency (ns)")
+plt.title("Latency of binary search vs random array indexing")
 # plt.grid(True)
 plt.xscale("log")
-plt.ylim(ymin=0)
+plt.ylim(ymin=0, ymax=350)
 ax = plt.gca()
 
 ax.grid(True, axis="y")
@@ -158,8 +129,8 @@ caches = [
 ]
 for name, c in caches[:-1]:
     ax.axvline(c, color="red", lw=0.3)
-    ax.text(c, 10, name + " ", ha="right", c="red", size="large", alpha=0.5)
-ax.text(data[-1][0], 10, caches[-1][0], ha="right", c="red", size="large", alpha=0.5)
+    ax.text(c, 1.05, name + " ", ha="right", c="red", size="large", alpha=0.5)
+ax.text(data[-1][0], 1.05, caches[-1][0], ha="right", c="red", size="large", alpha=0.5)
 
 ax.legend(loc="upper left")
 
