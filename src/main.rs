@@ -22,6 +22,21 @@ fn random_vec(n: usize) -> Vec<T> {
     (0..n).map(|_| rng.random_range(0..i32::MAX as T)).collect()
 }
 
+fn std_binary_search(v: &[T], x: T) -> usize {
+    let mut l = 0;
+    // inclusive right end
+    let mut h = v.len() - 1;
+    while l < h {
+        let m = (l + h + 1) / 2;
+        if x < v[m] {
+            h = m - 1;
+        } else {
+            l = m;
+        }
+    }
+    l
+}
+
 fn binary_search(v: &[T], x: T) -> usize {
     let mut l = 0;
     // inclusive right end
